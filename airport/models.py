@@ -49,7 +49,7 @@ class Airplane(models.Model):
         return self.name
 
     class Meta:
-        ordering = ("airplane_type", "-capacity")
+        ordering = ("airplane_type", "-rows", "-seats_in_row")
 
 
 class Country(models.Model):
