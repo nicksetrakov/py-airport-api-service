@@ -1,8 +1,10 @@
 import os
 import uuid
 
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+from rest_framework.exceptions import ValidationError
 
 
 class Crew(models.Model):
@@ -100,9 +102,7 @@ class Route(models.Model):
 
 
 class Flight(models.Model):
-    route = models.ForeignKey(
-        Route, on_delete=models.CASCADE, related_name="flights"
-    )
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="flights")
     airplane = models.ForeignKey(
         Airplane, on_delete=models.CASCADE, related_name="flights"
     )
@@ -111,10 +111,83 @@ class Flight(models.Model):
     crew = models.ManyToManyField(Crew, blank=True)
 
     def __str__(self) -> str | models.CharField:
-        return f"{self.route}-{self.airplane}"
+        return f"{str(self.route)}-{str(self.airplane)}"
 
     class Meta:
         ordering = (
             "-departure_time",
             "-arrival_time",
+        )
+
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
+    )
+
+    def __str__(self) -> str | models.CharField:
+        return str(self.created_at)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+
+class Ticket(models.Model):
+    row = models.IntegerField()
+    seat = models.IntegerField()
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
+
+    @staticmethod
+    def validate_ticket(row, seat, flight, error) -> None:
+        for ticket_attr_value, ticket_attr_name, flight_attr_name in [
+            (row, "row", "rows"),
+            (seat, "seat", "seats_in_row"),
+        ]:
+            count_attrs = getattr(flight, flight_attr_name)
+            if not (1 <= ticket_attr_value <= count_attrs):
+                raise error(
+                    {
+                        ticket_attr_name: f"{ticket_attr_name} "
+                        f"number must be in available range: "
+                        f"(1, {flight_attr_name}): "
+                        f"(1, {count_attrs})"
+                    }
+                )
+
+    def clean(self) -> None:
+        Ticket.validate_ticket(
+            self.row,
+            self.seat,
+            self.flight.airplane,
+            ValidationError,
+        )
+
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+    ) -> None:
+        self.full_clean()
+        return super(Ticket, self).save(
+            force_insert, force_update, using, update_fields
+        )
+
+    def __str__(self) -> str | models.CharField:
+        return (
+            f"{str(self.flight)} (row: {self.row}, seat: {self.seat})"
+        )
+
+    class Meta:
+        unique_together = (
+            "row",
+            "seat",
+            "flight",
+        )
+        ordering = (
+            "row",
+            "seat",
         )
