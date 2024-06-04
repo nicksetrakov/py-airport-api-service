@@ -177,9 +177,7 @@ class Ticket(models.Model):
         )
 
     def __str__(self) -> str | models.CharField:
-        return (
-            f"{str(self.flight)} (row: {self.row}, seat: {self.seat})"
-        )
+        return f"{str(self.flight)} (row: {self.row}, seat: {self.seat})"
 
     class Meta:
         unique_together = (
