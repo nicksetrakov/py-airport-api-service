@@ -95,5 +95,26 @@ class Route(models.Model):
     )
     distance = models.IntegerField()
 
-    def __str__(self):
+    def __str__(self) -> str | models.CharField:
         return f"{self.source.name}-{self.destination.name}"
+
+
+class Flight(models.Model):
+    route = models.ForeignKey(
+        Route, on_delete=models.CASCADE, related_name="flights"
+    )
+    airplane = models.ForeignKey(
+        Airplane, on_delete=models.CASCADE, related_name="flights"
+    )
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+    crew = models.ManyToManyField(Crew, blank=True)
+
+    def __str__(self) -> str | models.CharField:
+        return f"{self.route}-{self.airplane}"
+
+    class Meta:
+        ordering = (
+            "-departure_time",
+            "-arrival_time",
+        )
