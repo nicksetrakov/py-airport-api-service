@@ -4,9 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from airport.models import Crew, AirplaneType, Airplane
+from airport.models import Crew, AirplaneType, Airplane, Country
 from airport.serializers import CrewSerializer, AirplaneTypeSerializer, AirplaneSerializer, AirplaneListSerializer, \
-    AirplaneDetailSerializer, AirplaneImageSerializer
+    AirplaneDetailSerializer, AirplaneImageSerializer, CountrySerializer
 
 
 class CrewViewSet(viewsets.ModelViewSet):
@@ -56,3 +56,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    permission_classes = (IsAdminUser,)
