@@ -2,7 +2,12 @@ from django.urls import path, include
 from rest_framework import routers
 
 from airport.views import (
-    CrewViewSet, AirplaneTypeViewSet, AirplaneViewSet, CountryViewSet, CityViewSet,
+    CrewViewSet,
+    AirplaneTypeViewSet,
+    AirplaneViewSet,
+    CountryViewSet,
+    CityViewSet,
+    AirportViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -11,9 +16,8 @@ router.register("airplane-types", AirplaneTypeViewSet)
 router.register("airplanes", AirplaneViewSet)
 router.register("countries", CountryViewSet)
 router.register("cities", CityViewSet)
+router.register("airports", AirportViewSet)
 
-urlpatterns = [
-    path("", include(router.urls))
-]
+urlpatterns = [path("", include(router.urls))]
 
 app_name = "airport"
