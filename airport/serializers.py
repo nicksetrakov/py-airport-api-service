@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 
-from airport.models import Crew, AirplaneType, Airplane
+from airport.models import Crew, AirplaneType, Airplane, Country
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -53,3 +53,10 @@ class AirplaneImageSerializer(serializers.ModelSerializer):
 
 class AirplaneListSerializer(AirplaneSerializer):
     airplane_type = StringRelatedField()
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ("id", "name")
+
