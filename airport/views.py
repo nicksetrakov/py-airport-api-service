@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from airport.models import Crew, AirplaneType, Airplane, Country, City, Airport
+from airport.models import Crew, AirplaneType, Airplane, Country, City, Airport, Route
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -19,6 +19,9 @@ from airport.serializers import (
     AirportSerializer,
     AirportDetailSerializer,
     AirportListSerializer,
+    RouteSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer,
 )
 
 
@@ -111,6 +114,7 @@ class AirportViewSet(viewsets.ModelViewSet):
         "closest_big_city__country",
     )
     serializer_class = AirportSerializer
+    permission_classes = (IsAdminUser,)
 
     def get_permissions(self):
 
@@ -126,5 +130,31 @@ class AirportViewSet(viewsets.ModelViewSet):
             return AirportDetailSerializer
         if self.action == "list":
             return AirportListSerializer
+
+        return super().get_serializer_class()
+
+
+class RouteViewSet(viewsets.ModelViewSet):
+    queryset = Route.objects.select_related(
+        "source__closest_big_city__country",
+        "destination__closest_big_city__country",
+    )
+    serializer_class = RouteSerializer
+
+    def get_permissions(self):
+
+        if self.action in ("list", "retrieve"):
+            return [
+                IsAuthenticated(),
+            ]
+
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return RouteListSerializer
+
+        if self.action == "retrieve":
+            return RouteDetailSerializer
 
         return super().get_serializer_class()
