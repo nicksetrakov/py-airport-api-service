@@ -68,3 +68,7 @@ class CitySerializer(serializers.ModelSerializer):
 
 class CityListSerializer(CitySerializer):
     country = serializers.StringRelatedField()
+
+
+class CityDetailSerializer(CitySerializer):
+    country = CountrySerializer()
