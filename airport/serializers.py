@@ -97,3 +97,24 @@ class AirportListSerializer(AirportSerializer):
 
 class AirportDetailSerializer(AirportSerializer):
     closest_big_city = CityDetailSerializer()
+
+
+class RouteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Route
+        fields = (
+            "id",
+            "source",
+            "destination",
+            "distance",
+        )
+
+
+class RouteListSerializer(RouteSerializer):
+    source = serializers.StringRelatedField()
+    destination = serializers.StringRelatedField()
+
+
+class RouteDetailSerializer(RouteSerializer):
+    destination = AirportDetailSerializer()
+    source = AirportDetailSerializer()
