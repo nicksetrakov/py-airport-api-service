@@ -111,7 +111,7 @@ class Flight(models.Model):
     crew = models.ManyToManyField(Crew, blank=True)
 
     def __str__(self) -> str | models.CharField:
-        return f"{str(self.route)}-{str(self.airplane)}"
+        return f"Route: {str(self.route)}, Airplane: {str(self.airplane)}"
 
     class Meta:
         ordering = (
