@@ -14,6 +14,7 @@ from airport.models import (
     Airport,
     Route,
     Flight,
+    Order,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -35,6 +36,9 @@ from airport.serializers import (
     FlightSerializer,
     FlightListSerializer,
     FlightDetailSerializer,
+    OrderSerializer,
+    OrderListSerializer,
+    OrderDetailSerializer,
 )
 
 
@@ -189,7 +193,7 @@ class FlightViewSet(viewsets.ModelViewSet):
 
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
-                free_tickets_seat=F("airplane__rows") * F("airplane__seats_in_row")
+                tickets_available=F("airplane__rows") * F("airplane__seats_in_row")
                 - Count("tickets")
             )
         return queryset
@@ -211,3 +215,29 @@ class FlightViewSet(viewsets.ModelViewSet):
             return FlightDetailSerializer
 
         return super().get_serializer_class()
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.prefetch_related(
+        "tickets__flight__route__source__closest_big_city__country",
+        "tickets__flight__route__destination__closest_big_city__country",
+        "tickets__flight__crew",
+        "tickets__flight__airplane__airplane_type",
+    )
+    serializer_class = OrderSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+
+        if self.action == "retrieve":
+            return OrderDetailSerializer
+
+        return OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
