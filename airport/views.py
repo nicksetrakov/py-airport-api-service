@@ -1,10 +1,20 @@
+from django.db.models import Count, F
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from airport.models import Crew, AirplaneType, Airplane, Country, City, Airport, Route
+from airport.models import (
+    Crew,
+    AirplaneType,
+    Airplane,
+    Country,
+    City,
+    Airport,
+    Route,
+    Flight,
+)
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -22,6 +32,9 @@ from airport.serializers import (
     RouteSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
+    FlightSerializer,
+    FlightListSerializer,
+    FlightDetailSerializer,
 )
 
 
@@ -156,5 +169,45 @@ class RouteViewSet(viewsets.ModelViewSet):
 
         if self.action == "retrieve":
             return RouteDetailSerializer
+
+        return super().get_serializer_class()
+
+
+class FlightViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.select_related(
+        "route__source__closest_big_city__country",
+        "route__destination__closest_big_city__country",
+        "airplane__airplane_type",
+    ).prefetch_related("crew")
+    serializer_class = FlightSerializer
+    permission_classes = [
+        IsAdminUser,
+    ]
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.action in ("list", "retrieve"):
+            queryset = queryset.annotate(
+                free_tickets_seat=F("airplane__rows") * F("airplane__seats_in_row")
+                - Count("tickets")
+            )
+        return queryset
+
+    def get_permissions(self):
+        if self.action in ("list", "retrieve"):
+            return [
+                IsAuthenticated(),
+            ]
+
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+
+        if self.action == "list":
+            return FlightListSerializer
+
+        if self.action == "retrieve":
+            return FlightDetailSerializer
 
         return super().get_serializer_class()
