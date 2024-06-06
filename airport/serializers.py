@@ -1,6 +1,15 @@
 from rest_framework import serializers
 
-from airport.models import Crew, AirplaneType, Airplane, Country, City, Route, Airport
+from airport.models import (
+    Crew,
+    AirplaneType,
+    Airplane,
+    Country,
+    City,
+    Route,
+    Airport,
+    Flight,
+)
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -118,3 +127,56 @@ class RouteListSerializer(RouteSerializer):
 class RouteDetailSerializer(RouteSerializer):
     destination = AirportDetailSerializer()
     source = AirportDetailSerializer()
+
+
+class FlightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flight
+        fields = (
+            "id",
+            "route",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "crew",
+        )
+
+
+class FlightListSerializer(FlightSerializer):
+    route = serializers.StringRelatedField()
+    airplane = serializers.StringRelatedField()
+    crew = serializers.StringRelatedField(many=True)
+    departure_time = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M:%S", read_only=True
+    )
+    arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = (
+            "id",
+            "route",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "crew",
+        )
+
+
+class FlightDetailSerializer(FlightListSerializer):
+    route = RouteDetailSerializer()
+    airplane = AirplaneDetailSerializer()
+    crew = CrewSerializer(many=True)
+    count_free_seats = serializers.IntegerField(source="free_tickets_seat")
+
+    class Meta:
+        model = Flight
+        fields = (
+            "id",
+            "route",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "crew",
+            "count_free_seats",
+        )
