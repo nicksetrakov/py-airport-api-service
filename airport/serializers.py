@@ -150,12 +150,14 @@ class FlightListSerializer(FlightSerializer):
         format="%Y-%m-%d %H:%M:%S", read_only=True
     )
     arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    count_free_seats = serializers.IntegerField(source="free_tickets_seat")
 
     class Meta:
         model = Flight
         fields = (
             "id",
             "route",
+            "count_free_seats",
             "airplane",
             "departure_time",
             "arrival_time",
@@ -167,16 +169,3 @@ class FlightDetailSerializer(FlightListSerializer):
     route = RouteDetailSerializer()
     airplane = AirplaneDetailSerializer()
     crew = CrewSerializer(many=True)
-    count_free_seats = serializers.IntegerField(source="free_tickets_seat")
-
-    class Meta:
-        model = Flight
-        fields = (
-            "id",
-            "route",
-            "airplane",
-            "departure_time",
-            "arrival_time",
-            "crew",
-            "count_free_seats",
-        )
