@@ -1,4 +1,4 @@
-from django.db.models import Count, F
+from django.db.models import Count, F, ExpressionWrapper, IntegerField
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -65,10 +65,21 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.select_related("airplane_type")
     serializer_class = AirplaneSerializer
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
-    ordering_fields = ["name", "capacity", "airplane_type"]
+    ordering_fields = ["name", "airplane_capacity", "airplane_type"]
     search_fields = ["name", "airplane_type__name"]
     filterset_fields = ["airplane_type__name"]
     permission_classes = (IsAdminUser,)
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.action == "list":
+            queryset = queryset.annotate(
+                airplane_capacity=ExpressionWrapper(
+                    F("rows") * F("seats_in_row"), output_field=IntegerField()
+                )
+            )
+        return queryset
 
     def get_permissions(self):
         if self.action in ("list", "retrieve"):
