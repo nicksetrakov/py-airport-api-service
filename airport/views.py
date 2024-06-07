@@ -194,6 +194,24 @@ class RouteViewSet(viewsets.ModelViewSet):
         "destination__closest_big_city__country",
     )
     serializer_class = RouteSerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = ["source", "destination"]
+    search_fields = [
+        "source__name",
+        "source__closest_big_city__name",
+        "destination__closest_big_city__name",
+        "source__closest_big_city__country__name",
+        "destination__closest_big_city__country__name",
+    ]
+    filterset_fields = [
+        "source__name",
+        "destination__name",
+        "source__closest_big_city__name",
+        "destination__closest_big_city__name",
+        "source__closest_big_city__country__name",
+        "destination__closest_big_city__country__name",
+    ]
+    permission_classes = (IsAdminUser,)
 
     def get_permissions(self):
 
