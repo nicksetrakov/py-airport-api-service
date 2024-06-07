@@ -6,6 +6,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from airport.filters import FlightFilter
 from airport.models import (
     Crew,
     AirplaneType,
@@ -239,6 +240,16 @@ class FlightViewSet(viewsets.ModelViewSet):
         "airplane__airplane_type",
     ).prefetch_related("crew")
     serializer_class = FlightSerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = ["departure_time", "arrival_time"]
+    search_fields = [
+        "route__source__name",
+        "route__source__closest_big_city__name",
+        "route__destination__closest_big_city__name",
+        "route__source__closest_big_city__country__name",
+        "route__destination__closest_big_city__country__name",
+    ]
+    filterset_class = FlightFilter
     permission_classes = [
         IsAdminUser,
     ]
