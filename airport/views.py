@@ -1,6 +1,8 @@
 from django.db.models import Count, F
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
@@ -44,18 +46,28 @@ from airport.serializers import (
 class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
+    filter_backends = [OrderingFilter, SearchFilter]
+    ordering_fields = ["first_name", "last_name"]
+    search_fields = ["first_name", "last_name"]
     permission_classes = (IsAdminUser,)
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
+    filter_backends = [OrderingFilter, SearchFilter]
+    ordering_fields = ["name"]
+    search_fields = ["name"]
     permission_classes = (IsAdminUser,)
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.select_related("airplane_type")
     serializer_class = AirplaneSerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = ["name", "capacity", "airplane_type"]
+    search_fields = ["name", "airplane_type__name"]
+    filterset_fields = ["airplane_type__name"]
     permission_classes = (IsAdminUser,)
 
     def get_permissions(self):
