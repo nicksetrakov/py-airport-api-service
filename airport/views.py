@@ -160,6 +160,14 @@ class AirportViewSet(viewsets.ModelViewSet):
         "closest_big_city__country",
     )
     serializer_class = AirportSerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = ["name", "closest_big_city__name", "closest_big_city__country"]
+    search_fields = [
+        "name",
+        "closest_big_city__name",
+        "closest_big_city__country__name",
+    ]
+    filterset_fields = ["closest_big_city__name", "closest_big_city__country__name"]
     permission_classes = (IsAdminUser,)
 
     def get_permissions(self):
