@@ -291,10 +291,31 @@ class OrderViewSet(viewsets.ModelViewSet):
         "tickets__flight__airplane__airplane_type",
     )
     serializer_class = OrderSerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = [
+        "created_at",
+        "tickets__flight__departure_time",
+        "tickets__flight__arrival_time",
+    ]
+    search_fields = [
+        "tickets__flight__route__source__name",
+        "tickets__flight__route__source__closest_big_city__name",
+        "tickets__flight__route__destination__closest_big_city__name",
+        "tickets__flight__route__source__closest_big_city__country__name",
+        "tickets__flight__route__destination__closest_big_city__country__name",
+    ]
+    filterset_fields = [
+        "tickets__flight__route__source__name",
+        "tickets__flight__route__destination__name",
+        "tickets__flight__route__source__closest_big_city__name",
+        "tickets__flight__route__destination__closest_big_city__name",
+        "tickets__flight__route__source__closest_big_city__country__name",
+        "tickets__flight__route__destination__closest_big_city__country__name",
+    ]
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return Order.objects.filter(user=self.request.user).distinct()
 
     def get_serializer_class(self):
         if self.action == "list":
