@@ -130,12 +130,19 @@ class AirplaneViewSet(viewsets.ModelViewSet):
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+    filter_backends = [OrderingFilter, SearchFilter]
+    ordering_fields = ["name"]
+    search_fields = ["name"]
     permission_classes = (IsAdminUser,)
 
 
 class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.select_related("country")
     serializer_class = CitySerializer
+    filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
+    ordering_fields = ["name", "country"]
+    search_fields = ["name"]
+    filterset_fields = ["country__name"]
     permission_classes = (IsAdminUser,)
 
     def get_serializer_class(self):
