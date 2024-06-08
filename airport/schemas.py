@@ -12,6 +12,7 @@ from .serializers import (
     AirplaneImageSerializer,
     AirplaneDetailSerializer,
     AirplaneListSerializer,
+    CountrySerializer,
 )
 
 
@@ -88,4 +89,26 @@ class AirplaneSchema:
         responses={
             200: AirplaneDetailSerializer,
         }
+    )
+
+
+class CountrySchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description="Order by name (ex. ?ordering=name)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="search",
+                description="Search by name (ex. ?search=Ukraine)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: CountrySerializer(many=True),
+        },
     )
