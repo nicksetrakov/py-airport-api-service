@@ -12,11 +12,8 @@ class FlightFilter(filters.FilterSet):
         model = Flight
         fields = [
             "route__source__name",
-            "route__destination__name",
             "route__source__closest_big_city__name",
-            "route__destination__closest_big_city__name",
             "route__source__closest_big_city__country__name",
-            "route__destination__closest_big_city__country__name",
             "departure_time",
             "arrival_time",
         ]
