@@ -25,6 +25,7 @@ from airport.schemas import (
     AirplaneTypeSchema,
     AirplaneSchema,
     CountrySchema,
+    CitySchema,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -144,6 +145,10 @@ class CountryViewSet(viewsets.ModelViewSet):
     ]
 
 
+@extend_schema_view(
+    list=CitySchema.list,
+    retrieve=CitySchema.retrieve,
+)
 class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.select_related("country")
     serializer_class = CitySerializer
