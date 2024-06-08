@@ -6,7 +6,7 @@ from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiResponse,
 )
-from .serializers import CrewSerializer
+from .serializers import CrewSerializer, AirplaneTypeSerializer
 
 
 class CrewSchema:
@@ -27,4 +27,29 @@ class CrewSchema:
                 type=OpenApiTypes.STR,
             ),
         ],
+        responses={
+            200: CrewSerializer(many=True),
+        },
+    )
+
+
+class AirplaneTypeSchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description="Order by name (ex. ?ordering=name)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="search",
+                description="Search by name (ex. ?search=Boeing)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: AirplaneTypeSerializer(many=True),
+        },
     )
