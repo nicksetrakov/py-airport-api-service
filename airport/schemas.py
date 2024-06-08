@@ -17,6 +17,8 @@ from .serializers import (
     CityDetailSerializer,
     AirportListSerializer,
     AirportDetailSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer,
 )
 
 
@@ -176,7 +178,7 @@ class AirportSchema:
             OpenApiParameter(
                 name="search",
                 description=(
-                    "Search by name, closest big city name, closest big city country name (ex. ?search=Kiev)"
+                    "Search by name, city name, country name (ex. ?search=Kiev)"
                 ),
                 required=False,
                 type=OpenApiTypes.STR,
@@ -201,5 +203,66 @@ class AirportSchema:
     retrieve = extend_schema(
         responses={
             200: AirportDetailSerializer,
+        }
+    )
+
+
+class RouteSchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description=(
+                    "Order by source, destination" "(ex. ?ordering=source,-destination)"
+                ),
+                required=False,
+                type={"type": "array", "items": {"type": "string"}},
+                style="form",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="search",
+                description=(
+                    "Search by source name, city name and country name "
+                    "(ex. ?search=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="source__name",
+                description=(
+                    "Filter by source__name "
+                    "(ex. ?source__name=Borispil)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="source__closest_big_city__name",
+                description=(
+                    "Filter by source__closest_big_city__name "
+                    "(ex. ?source__closest_big_city__name=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="source__closest_big_city__country__name",
+                description=(
+                    "Filter by source__closest_big_city__country__name "
+                    "(ex. ?source__closest_big_city__country__name=Ukraine)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: RouteListSerializer(many=True),
+        },
+    )
+    retrieve = extend_schema(
+        responses={
+            200: RouteDetailSerializer,
         }
     )
