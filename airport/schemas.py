@@ -20,7 +20,7 @@ from .serializers import (
     RouteListSerializer,
     RouteDetailSerializer,
     FlightListSerializer,
-    FlightDetailSerializer,
+    FlightDetailSerializer, OrderListSerializer, OrderDetailSerializer,
 )
 
 
@@ -361,5 +361,67 @@ class FlightSchema:
     retrieve = extend_schema(
         responses={
             200: FlightDetailSerializer,
+        }
+    )
+
+
+class OrderSchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description=(
+                    "Order by created_at, tickets__flight__departure_time, tickets__flight__arrival_time"
+                    "(ex. ?ordering=created_at,-tickets__flight__departure_time)"
+                ),
+                required=False,
+                type={"type": "array", "items": {"type": "string"}},
+                style="form",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="search",
+                description=(
+                    "Search by source name, city name and country name "
+                    "(ex. ?search=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="route__source__name",
+                description=(
+                    "Filter by route__source__name "
+                    "(ex. ?route__source__name=Borispil)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="tickets__flight__route__source__closest_big_city__name",
+                description=(
+                    "Filter by tickets__flight__route__source__closest_big_city__name "
+                    "(ex. ?tickets__flight__route__source__closest_big_city__name=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="tickets__flight__route__source__closest_big_city__country__name",
+                description=(
+                    "Filter by tickets__flight__route__source__closest_big_city__country__name "
+                    "(ex. ?tickets__flight__route__source__closest_big_city__country__name=Ukraine)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: OrderListSerializer(many=True),
+        },
+    )
+    retrieve = extend_schema(
+        responses={
+            200: OrderDetailSerializer,
         }
     )
