@@ -1,5 +1,6 @@
 from django.db.models import Count, F, ExpressionWrapper, IntegerField
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema_view
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -19,6 +20,7 @@ from airport.models import (
     Order,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
+from airport.schemas import CrewSchema
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -45,13 +47,16 @@ from airport.serializers import (
 )
 
 
+@extend_schema_view(list=CrewSchema.list)
 class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     filter_backends = [OrderingFilter, SearchFilter]
     ordering_fields = ["first_name", "last_name"]
     search_fields = ["first_name", "last_name"]
-    permission_classes = (IsAdminUser,)
+    permission_classes = [
+        IsAdminUser,
+    ]
 
 
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
@@ -60,7 +65,9 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
     filter_backends = [OrderingFilter, SearchFilter]
     ordering_fields = ["name"]
     search_fields = ["name"]
-    permission_classes = (IsAdminUser,)
+    permission_classes = [
+        IsAdminUser,
+    ]
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
@@ -70,7 +77,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "airplane_capacity", "airplane_type"]
     search_fields = ["name", "airplane_type__name"]
     filterset_fields = ["airplane_type__name"]
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_queryset(self):
         queryset = self.queryset
@@ -117,7 +126,9 @@ class CountryViewSet(viewsets.ModelViewSet):
     filter_backends = [OrderingFilter, SearchFilter]
     ordering_fields = ["name"]
     search_fields = ["name"]
-    permission_classes = (IsAdminUser,)
+    permission_classes = [
+        IsAdminUser,
+    ]
 
 
 class CityViewSet(viewsets.ModelViewSet):
@@ -127,7 +138,9 @@ class CityViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "country"]
     search_fields = ["name"]
     filterset_fields = ["country__name"]
-    permission_classes = (IsAdminUser,)
+    permission_classes = [
+        IsAdminUser,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -152,7 +165,9 @@ class AirportViewSet(viewsets.ModelViewSet):
         "closest_big_city__country__name",
     ]
     filterset_fields = ["closest_big_city__name", "closest_big_city__country__name"]
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -186,7 +201,9 @@ class RouteViewSet(viewsets.ModelViewSet):
         "source__closest_big_city__country__name",
         "destination__closest_big_city__country__name",
     ]
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -215,10 +232,12 @@ class FlightViewSet(viewsets.ModelViewSet):
         "route__destination__closest_big_city__country__name",
     ]
     filterset_class = FlightFilter
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = [
+        IsAdminOrIfAuthenticatedReadOnly,
+    ]
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
@@ -267,7 +286,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         "tickets__flight__route__source__closest_big_city__country__name",
         "tickets__flight__route__destination__closest_big_city__country__name",
     ]
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [
+        IsAuthenticated,
+    ]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).distinct()
@@ -277,7 +298,11 @@ class OrderViewSet(viewsets.ModelViewSet):
             "update",
             "partial_update",
         ):
-            return IsAdminUser()
+            return [
+                IsAdminUser(),
+            ]
+
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action == "list":
