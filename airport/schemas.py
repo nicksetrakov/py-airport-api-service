@@ -79,6 +79,12 @@ class AirplaneSchema:
                 required=False,
                 type=OpenApiTypes.STR,
             ),
+            OpenApiParameter(
+                name="airplane_type",
+                description="Filter by airplane type name (ex. ?airplane_type__name=Boeing 747)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
         ],
         responses={
             200: AirplaneListSerializer(many=True),
