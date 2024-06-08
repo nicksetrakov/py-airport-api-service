@@ -15,6 +15,8 @@ from .serializers import (
     CountrySerializer,
     CityListSerializer,
     CityDetailSerializer,
+    AirportListSerializer,
+    AirportDetailSerializer,
 )
 
 
@@ -153,5 +155,51 @@ class CitySchema:
     retrieve = extend_schema(
         responses={
             200: CityDetailSerializer,
+        }
+    )
+
+
+class AirportSchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description=(
+                    "Order by name, closest_big_city__name, closest_big_city__country "
+                    "(ex. ?ordering=name,-closest_big_city__country)"
+                ),
+                required=False,
+                type={"type": "array", "items": {"type": "string"}},
+                style="form",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="search",
+                description=(
+                    "Search by name, closest big city name, closest big city country name (ex. ?search=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="closest_big_city__name",
+                description="Filter by closest_big_city__name (ex. ?closest_big_city__name=Kiev)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="closest_big_city__country__name",
+                description="Filter by closest_big_city__country__name (ex. ?closest_big_city__country__name=Ukraine)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: AirportListSerializer(many=True),
+        },
+    )
+    retrieve = extend_schema(
+        responses={
+            200: AirportDetailSerializer,
         }
     )
