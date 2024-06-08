@@ -18,6 +18,7 @@ from airport.models import (
     Flight,
     Order,
 )
+from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -69,7 +70,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "airplane_capacity", "airplane_type"]
     search_fields = ["name", "airplane_type__name"]
     filterset_fields = ["airplane_type__name"]
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -81,24 +82,6 @@ class AirplaneViewSet(viewsets.ModelViewSet):
                 )
             )
         return queryset
-
-    def get_permissions(self):
-        if self.action in ("list", "retrieve"):
-            return [
-                IsAuthenticated(),
-            ]
-        if self.action in (
-            "create",
-            "update",
-            "partial_update",
-            "upload_image",
-            "destroy",
-        ):
-            return [
-                IsAdminUser(),
-            ]
-
-        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -169,16 +152,7 @@ class AirportViewSet(viewsets.ModelViewSet):
         "closest_big_city__country__name",
     ]
     filterset_fields = ["closest_big_city__name", "closest_big_city__country__name"]
-    permission_classes = (IsAdminUser,)
-
-    def get_permissions(self):
-
-        if self.action in ("list", "retrieve"):
-            return [
-                IsAuthenticated(),
-            ]
-
-        return super().get_permissions()
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -212,16 +186,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         "source__closest_big_city__country__name",
         "destination__closest_big_city__country__name",
     ]
-    permission_classes = (IsAdminUser,)
-
-    def get_permissions(self):
-
-        if self.action in ("list", "retrieve"):
-            return [
-                IsAuthenticated(),
-            ]
-
-        return super().get_permissions()
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -250,9 +215,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         "route__destination__closest_big_city__country__name",
     ]
     filterset_class = FlightFilter
-    permission_classes = [
-        IsAdminUser,
-    ]
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -263,14 +226,6 @@ class FlightViewSet(viewsets.ModelViewSet):
                 - Count("tickets")
             )
         return queryset
-
-    def get_permissions(self):
-        if self.action in ("list", "retrieve"):
-            return [
-                IsAuthenticated(),
-            ]
-
-        return super().get_permissions()
 
     def get_serializer_class(self):
 
@@ -316,6 +271,13 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).distinct()
+
+    def get_permissions(self):
+        if self.action in (
+            "update",
+            "partial_update",
+        ):
+            return IsAdminUser()
 
     def get_serializer_class(self):
         if self.action == "list":
