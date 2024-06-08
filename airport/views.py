@@ -20,7 +20,7 @@ from airport.models import (
     Order,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
-from airport.schemas import CrewSchema, AirplaneTypeSchema, AirplaneSchema
+from airport.schemas import CrewSchema, AirplaneTypeSchema, AirplaneSchema, CountrySchema
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -125,6 +125,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema_view(
+    list=CountrySchema.list,
+)
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
