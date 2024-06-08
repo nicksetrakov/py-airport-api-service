@@ -13,6 +13,8 @@ from .serializers import (
     AirplaneDetailSerializer,
     AirplaneListSerializer,
     CountrySerializer,
+    CityListSerializer,
+    CityDetailSerializer,
 )
 
 
@@ -80,7 +82,7 @@ class AirplaneSchema:
                 type=OpenApiTypes.STR,
             ),
             OpenApiParameter(
-                name="airplane_type",
+                name="airplane_type__name",
                 description="Filter by airplane type name (ex. ?airplane_type__name=Boeing 747)",
                 required=False,
                 type=OpenApiTypes.STR,
@@ -117,4 +119,39 @@ class CountrySchema:
         responses={
             200: CountrySerializer(many=True),
         },
+    )
+
+
+class CitySchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description="Order by name, country (ex. ?ordering=name,-country)",
+                required=False,
+                type={"type": "array", "items": {"type": "string"}},
+                style="form",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="search",
+                description="Search by name (ex. ?search=Kiev)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="country__name",
+                description="Filter by country name (ex. ?country__name=Ukraine)",
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+        ],
+        responses={
+            200: CityListSerializer(many=True),
+        },
+    )
+    retrieve = extend_schema(
+        responses={
+            200: CityDetailSerializer,
+        }
     )
