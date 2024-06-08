@@ -27,6 +27,7 @@ from airport.schemas import (
     CountrySchema,
     CitySchema,
     AirportSchema,
+    RouteSchema,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -201,6 +202,10 @@ class AirportViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
 
+@extend_schema_view(
+    list=RouteSchema.list,
+    retrieve=RouteSchema.retrieve,
+)
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.select_related(
         "source__closest_big_city__country",
@@ -212,17 +217,12 @@ class RouteViewSet(viewsets.ModelViewSet):
     search_fields = [
         "source__name",
         "source__closest_big_city__name",
-        "destination__closest_big_city__name",
         "source__closest_big_city__country__name",
-        "destination__closest_big_city__country__name",
     ]
     filterset_fields = [
         "source__name",
-        "destination__name",
         "source__closest_big_city__name",
-        "destination__closest_big_city__name",
         "source__closest_big_city__country__name",
-        "destination__closest_big_city__country__name",
     ]
     permission_classes = [
         IsAdminOrIfAuthenticatedReadOnly,
