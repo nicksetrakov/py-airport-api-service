@@ -26,6 +26,7 @@ from airport.schemas import (
     AirplaneSchema,
     CountrySchema,
     CitySchema,
+    AirportSchema,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -170,6 +171,10 @@ class CityViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
 
+@extend_schema_view(
+    list=AirportSchema.list,
+    retrieve=AirportSchema.retrieve,
+)
 class AirportViewSet(viewsets.ModelViewSet):
     queryset = Airport.objects.select_related(
         "closest_big_city__country",
