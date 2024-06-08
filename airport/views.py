@@ -20,7 +20,7 @@ from airport.models import (
     Order,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
-from airport.schemas import CrewSchema
+from airport.schemas import CrewSchema, AirplaneTypeSchema
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -59,6 +59,7 @@ class CrewViewSet(viewsets.ModelViewSet):
     ]
 
 
+@extend_schema_view(list=AirplaneTypeSchema.list)
 class AirplaneTypeViewSet(viewsets.ModelViewSet):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
