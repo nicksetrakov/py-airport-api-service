@@ -27,7 +27,7 @@ from airport.schemas import (
     CountrySchema,
     CitySchema,
     AirportSchema,
-    RouteSchema, FlightSchema,
+    RouteSchema, FlightSchema, OrderSchema,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -267,7 +267,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
                 tickets_available=F("airplane__rows") * F("airplane__seats_in_row")
-                - Count("tickets")
+                                  - Count("tickets")
             )
         return queryset
 
@@ -282,6 +282,10 @@ class FlightViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
 
+@extend_schema_view(
+    list=OrderSchema.list,
+    retrieve=OrderSchema.retrieve,
+)
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related(
         "tickets__flight__route__source__closest_big_city__country",
@@ -299,17 +303,12 @@ class OrderViewSet(viewsets.ModelViewSet):
     search_fields = [
         "tickets__flight__route__source__name",
         "tickets__flight__route__source__closest_big_city__name",
-        "tickets__flight__route__destination__closest_big_city__name",
         "tickets__flight__route__source__closest_big_city__country__name",
-        "tickets__flight__route__destination__closest_big_city__country__name",
     ]
     filterset_fields = [
         "tickets__flight__route__source__name",
-        "tickets__flight__route__destination__name",
         "tickets__flight__route__source__closest_big_city__name",
-        "tickets__flight__route__destination__closest_big_city__name",
         "tickets__flight__route__source__closest_big_city__country__name",
-        "tickets__flight__route__destination__closest_big_city__country__name",
     ]
     permission_classes = [
         IsAuthenticated,
@@ -320,8 +319,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in (
-            "update",
-            "partial_update",
+                "update",
+                "partial_update",
         ):
             return [
                 IsAdminUser(),
