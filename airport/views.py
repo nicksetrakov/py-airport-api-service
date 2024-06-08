@@ -20,7 +20,12 @@ from airport.models import (
     Order,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
-from airport.schemas import CrewSchema, AirplaneTypeSchema, AirplaneSchema, CountrySchema
+from airport.schemas import (
+    CrewSchema,
+    AirplaneTypeSchema,
+    AirplaneSchema,
+    CountrySchema,
+)
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -250,7 +255,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
                 tickets_available=F("airplane__rows") * F("airplane__seats_in_row")
-                                  - Count("tickets")
+                - Count("tickets")
             )
         return queryset
 
@@ -303,8 +308,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in (
-                "update",
-                "partial_update",
+            "update",
+            "partial_update",
         ):
             return [
                 IsAdminUser(),
