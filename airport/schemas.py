@@ -19,6 +19,8 @@ from .serializers import (
     AirportDetailSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
+    FlightListSerializer,
+    FlightDetailSerializer,
 )
 
 
@@ -231,10 +233,7 @@ class RouteSchema:
             ),
             OpenApiParameter(
                 name="source__name",
-                description=(
-                    "Filter by source__name "
-                    "(ex. ?source__name=Borispil)"
-                ),
+                description=("Filter by source__name " "(ex. ?source__name=Borispil)"),
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -264,5 +263,103 @@ class RouteSchema:
     retrieve = extend_schema(
         responses={
             200: RouteDetailSerializer,
+        }
+    )
+
+
+class FlightSchema:
+    list = extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="ordering",
+                description=(
+                    "Order by departure_time, arrival_time"
+                    "(ex. ?ordering=departure_time,-arrival_time)"
+                ),
+                required=False,
+                type={"type": "array", "items": {"type": "string"}},
+                style="form",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="search",
+                description=(
+                    "Search by source name, city name and country name "
+                    "(ex. ?search=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="route__source__name",
+                description=(
+                    "Filter by route__source__name "
+                    "(ex. ?route__source__name=Borispil)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="route__source__closest_big_city__name",
+                description=(
+                    "Filter by route__source__closest_big_city__name "
+                    "(ex. ?route__source__closest_big_city__name=Kiev)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="route__source__closest_big_city__country__name",
+                description=(
+                    "Filter by route__source__closest_big_city__country__name "
+                    "(ex. ?route__source__closest_big_city__country__name=Ukraine)"
+                ),
+                required=False,
+                type=OpenApiTypes.STR,
+            ),
+            OpenApiParameter(
+                name="departure_time_after",
+                description=(
+                    "Filter flights with departure time greater than or equal to "
+                    "the specified date (ex. ?departure_time_after=2023-01-01)"
+                ),
+                required=False,
+                type=OpenApiTypes.DATE,
+            ),
+            OpenApiParameter(
+                name="departure_time_before",
+                description=(
+                    "Filter flights with departure time less than or equal to "
+                    "the specified date (ex. ?departure_time_before=2023-01-31)"
+                ),
+                required=False,
+                type=OpenApiTypes.DATE,
+            ),
+            OpenApiParameter(
+                name="arrival_time_after",
+                description=(
+                    "Filter flights with arrival time greater than or equal to "
+                    "the specified date (ex. ?arrival_time_after=2023-01-01)"
+                ),
+                required=False,
+                type=OpenApiTypes.DATE,
+            ),
+            OpenApiParameter(
+                name="arrival_time_before",
+                description=(
+                    "Filter flights with arrival time less than or equal to "
+                    "the specified date (ex. ?arrival_time_before=2023-01-31)"
+                ),
+                required=False,
+                type=OpenApiTypes.DATE,
+            ),
+        ],
+        responses={
+            200: FlightListSerializer(many=True),
+        },
+    )
+    retrieve = extend_schema(
+        responses={
+            200: FlightDetailSerializer,
         }
     )
