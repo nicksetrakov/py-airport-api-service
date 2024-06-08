@@ -20,7 +20,9 @@ from .serializers import (
     RouteListSerializer,
     RouteDetailSerializer,
     FlightListSerializer,
-    FlightDetailSerializer, OrderListSerializer, OrderDetailSerializer,
+    FlightDetailSerializer,
+    OrderListSerializer,
+    OrderDetailSerializer,
 )
 
 
@@ -29,7 +31,8 @@ class CrewSchema:
         parameters=[
             OpenApiParameter(
                 name="ordering",
-                description="Order by first_name or last_name (ex. ?ordering=first_name,last_name)",
+                description="Order by first_name or last_name "
+                "(ex. ?ordering=first_name,last_name)",
                 required=False,
                 type={"type": "array", "items": {"type": "string"}},
                 style="form",
@@ -37,7 +40,8 @@ class CrewSchema:
             ),
             OpenApiParameter(
                 name="search",
-                description="Search by first_name or last_name (ex. ?search=David)",
+                description="Search by first_name or last_name "
+                "(ex. ?search=David)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -75,7 +79,9 @@ class AirplaneSchema:
         parameters=[
             OpenApiParameter(
                 name="ordering",
-                description="Order by name, airplane_capacity, or airplane_type (ex. ?ordering=name,-airplane_capacity)",
+                description="Order by name, airplane_capacity"
+                " or airplane_type "
+                "(ex. ?ordering=name,-airplane_capacity)",
                 required=False,
                 type={"type": "array", "items": {"type": "string"}},
                 style="form",
@@ -83,13 +89,15 @@ class AirplaneSchema:
             ),
             OpenApiParameter(
                 name="search",
-                description="Search by name or airplane type name (ex. ?search=Boeing)",
+                description="Search by name or airplane type name "
+                "(ex. ?search=Boeing)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
             OpenApiParameter(
                 name="airplane_type__name",
-                description="Filter by airplane type name (ex. ?airplane_type__name=Boeing 747)",
+                description="Filter by airplane type name "
+                "(ex. ?airplane_type__name=Boeing 747)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -133,7 +141,8 @@ class CitySchema:
         parameters=[
             OpenApiParameter(
                 name="ordering",
-                description="Order by name, country (ex. ?ordering=name,-country)",
+                description="Order by name, country "
+                "(ex. ?ordering=name,-country)",
                 required=False,
                 type={"type": "array", "items": {"type": "string"}},
                 style="form",
@@ -147,7 +156,8 @@ class CitySchema:
             ),
             OpenApiParameter(
                 name="country__name",
-                description="Filter by country name (ex. ?country__name=Ukraine)",
+                description="Filter by country name "
+                "(ex. ?country__name=Ukraine)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -169,7 +179,8 @@ class AirportSchema:
             OpenApiParameter(
                 name="ordering",
                 description=(
-                    "Order by name, closest_big_city__name, closest_big_city__country "
+                    "Order by name, closest_big_city__name, "
+                    "closest_big_city__country "
                     "(ex. ?ordering=name,-closest_big_city__country)"
                 ),
                 required=False,
@@ -180,20 +191,23 @@ class AirportSchema:
             OpenApiParameter(
                 name="search",
                 description=(
-                    "Search by name, city name, country name (ex. ?search=Kiev)"
+                    "Search by name, city name, country name "
+                    "(ex. ?search=Kiev)"
                 ),
                 required=False,
                 type=OpenApiTypes.STR,
             ),
             OpenApiParameter(
                 name="closest_big_city__name",
-                description="Filter by closest_big_city__name (ex. ?closest_big_city__name=Kiev)",
+                description="Filter by closest_big_city__name "
+                "(ex. ?closest_big_city__name=Kiev)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
             OpenApiParameter(
                 name="closest_big_city__country__name",
-                description="Filter by closest_big_city__country__name (ex. ?closest_big_city__country__name=Ukraine)",
+                description="Filter by closest_big_city__country__name "
+                "(ex. ?closest_big_city__country__name=Ukraine)",
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -215,7 +229,8 @@ class RouteSchema:
             OpenApiParameter(
                 name="ordering",
                 description=(
-                    "Order by source, destination" "(ex. ?ordering=source,-destination)"
+                    "Order by source, destination"
+                    "(ex. ?ordering=source,-destination)"
                 ),
                 required=False,
                 type={"type": "array", "items": {"type": "string"}},
@@ -233,7 +248,9 @@ class RouteSchema:
             ),
             OpenApiParameter(
                 name="source__name",
-                description=("Filter by source__name " "(ex. ?source__name=Borispil)"),
+                description=(
+                    "Filter by source__name " "(ex. ?source__name=Borispil)"
+                ),
                 required=False,
                 type=OpenApiTypes.STR,
             ),
@@ -312,7 +329,8 @@ class FlightSchema:
                 name="route__source__closest_big_city__country__name",
                 description=(
                     "Filter by route__source__closest_big_city__country__name "
-                    "(ex. ?route__source__closest_big_city__country__name=Ukraine)"
+                    "(ex. ?route__source__closest_big_city"
+                    "__country__name=Ukraine)"
                 ),
                 required=False,
                 type=OpenApiTypes.STR,
@@ -320,8 +338,10 @@ class FlightSchema:
             OpenApiParameter(
                 name="departure_time_after",
                 description=(
-                    "Filter flights with departure time greater than or equal to "
-                    "the specified date (ex. ?departure_time_after=2023-01-01)"
+                    "Filter flights with departure time"
+                    " greater than or equal to "
+                    "the specified date "
+                    "(ex. ?departure_time_after=2023-01-01)"
                 ),
                 required=False,
                 type=OpenApiTypes.DATE,
@@ -330,7 +350,8 @@ class FlightSchema:
                 name="departure_time_before",
                 description=(
                     "Filter flights with departure time less than or equal to "
-                    "the specified date (ex. ?departure_time_before=2023-01-31)"
+                    "the specified date "
+                    "(ex. ?departure_time_before=2023-01-31)"
                 ),
                 required=False,
                 type=OpenApiTypes.DATE,
@@ -338,7 +359,8 @@ class FlightSchema:
             OpenApiParameter(
                 name="arrival_time_after",
                 description=(
-                    "Filter flights with arrival time greater than or equal to "
+                    "Filter flights with arrival"
+                    " time greater than or equal to "
                     "the specified date (ex. ?arrival_time_after=2023-01-01)"
                 ),
                 required=False,
@@ -371,8 +393,10 @@ class OrderSchema:
             OpenApiParameter(
                 name="ordering",
                 description=(
-                    "Order by created_at, tickets__flight__departure_time, tickets__flight__arrival_time"
-                    "(ex. ?ordering=created_at,-tickets__flight__departure_time)"
+                    "Order by created_at, tickets__flight__departure_time,"
+                    " tickets__flight__arrival_time"
+                    "(ex. ?ordering=created_at,"
+                    "-tickets__flight__departure_time)"
                 ),
                 required=False,
                 type={"type": "array", "items": {"type": "string"}},
@@ -400,17 +424,23 @@ class OrderSchema:
             OpenApiParameter(
                 name="tickets__flight__route__source__closest_big_city__name",
                 description=(
-                    "Filter by tickets__flight__route__source__closest_big_city__name "
-                    "(ex. ?tickets__flight__route__source__closest_big_city__name=Kiev)"
+                    "Filter by tickets__flight__route__"
+                    "source__closest_big_city__name "
+                    "(ex. ?tickets__flight__route__"
+                    "source__closest_big_city__name=Kiev)"
                 ),
                 required=False,
                 type=OpenApiTypes.STR,
             ),
             OpenApiParameter(
-                name="tickets__flight__route__source__closest_big_city__country__name",
+                name="tickets__flight__route__source__"
+                "closest_big_city__country__name",
                 description=(
-                    "Filter by tickets__flight__route__source__closest_big_city__country__name "
-                    "(ex. ?tickets__flight__route__source__closest_big_city__country__name=Ukraine)"
+                    "Filter by "
+                    "tickets__flight__route__source__"
+                    "closest_big_city__country__name "
+                    "(ex. ?tickets__flight__route__source__"
+                    "closest_big_city__country__name=Ukraine)"
                 ),
                 required=False,
                 type=OpenApiTypes.STR,

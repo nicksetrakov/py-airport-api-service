@@ -27,7 +27,9 @@ from airport.schemas import (
     CountrySchema,
     CitySchema,
     AirportSchema,
-    RouteSchema, FlightSchema, OrderSchema,
+    RouteSchema,
+    FlightSchema,
+    OrderSchema,
 )
 from airport.serializers import (
     CrewSerializer,
@@ -182,13 +184,20 @@ class AirportViewSet(viewsets.ModelViewSet):
     )
     serializer_class = AirportSerializer
     filter_backends = [OrderingFilter, SearchFilter, DjangoFilterBackend]
-    ordering_fields = ["name", "closest_big_city__name", "closest_big_city__country"]
+    ordering_fields = [
+        "name",
+        "closest_big_city__name",
+        "closest_big_city__country",
+    ]
     search_fields = [
         "name",
         "closest_big_city__name",
         "closest_big_city__country__name",
     ]
-    filterset_fields = ["closest_big_city__name", "closest_big_city__country__name"]
+    filterset_fields = [
+        "closest_big_city__name",
+        "closest_big_city__country__name",
+    ]
     permission_classes = [
         IsAdminOrIfAuthenticatedReadOnly,
     ]
@@ -266,8 +275,9 @@ class FlightViewSet(viewsets.ModelViewSet):
 
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
-                tickets_available=F("airplane__rows") * F("airplane__seats_in_row")
-                                  - Count("tickets")
+                tickets_available=F("airplane__rows")
+                * F("airplane__seats_in_row")
+                - Count("tickets")
             )
         return queryset
 
@@ -319,8 +329,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in (
-                "update",
-                "partial_update",
+            "update",
+            "partial_update",
         ):
             return [
                 IsAdminUser(),

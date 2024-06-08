@@ -154,7 +154,9 @@ class FlightListSerializer(FlightSerializer):
     departure_time = serializers.DateTimeField(
         format="%Y-%m-%d %H:%M:%S", read_only=True
     )
-    arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    arrival_time = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M:%S", read_only=True
+    )
 
     class Meta:
         model = Flight
@@ -173,7 +175,10 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs)
         Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["flight"].airplane, ValidationError
+            attrs["row"],
+            attrs["seat"],
+            attrs["flight"].airplane,
+            ValidationError,
         )
         return data
 
@@ -195,7 +200,9 @@ class TicketSeatSerializer(TicketSerializer):
 
 class FlightDetailSerializer(FlightListSerializer):
     route = RouteDetailSerializer()
-    taken_places = TicketSeatSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatSerializer(
+        source="tickets", many=True, read_only=True
+    )
     airplane = AirplaneDetailSerializer()
     crew = CrewSerializer(many=True)
 
@@ -222,7 +229,9 @@ class TicketDetailSerializer(TicketSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
-    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    created_at = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M:%S", read_only=True
+    )
 
     class Meta:
         model = Order
