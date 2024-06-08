@@ -20,7 +20,7 @@ from airport.models import (
     Order,
 )
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
-from airport.schemas import CrewSchema, AirplaneTypeSchema
+from airport.schemas import CrewSchema, AirplaneTypeSchema, AirplaneSchema
 from airport.serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
@@ -71,6 +71,10 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
     ]
 
 
+@extend_schema_view(
+    list=AirplaneSchema.list,
+    retrieve=AirplaneSchema.retrieve,
+)
 class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.select_related("airplane_type")
     serializer_class = AirplaneSerializer
@@ -243,7 +247,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             queryset = queryset.annotate(
                 tickets_available=F("airplane__rows") * F("airplane__seats_in_row")
-                - Count("tickets")
+                                  - Count("tickets")
             )
         return queryset
 
@@ -296,8 +300,8 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in (
-            "update",
-            "partial_update",
+                "update",
+                "partial_update",
         ):
             return [
                 IsAdminUser(),
