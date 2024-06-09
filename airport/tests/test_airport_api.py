@@ -243,15 +243,16 @@ class CityApiTests(APITestCase):
         self.client.force_authenticate(self.user)
 
     def test_list_cities(self):
-        sample_country()
-        sample_country(name="City 2")
+        country = sample_country()
+        sample_city(country=country)
+        sample_city(name="City 2", country=country)
 
         url = reverse("airport:city-list")
         res = self.client.get(url)
 
-        countries = Country.objects.all()
+        cities = City.objects.all()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(2, countries.count())
+        self.assertEqual(2, cities.count())
 
     def test_create_city(self):
         url = reverse("airport:city-list")
@@ -271,22 +272,26 @@ class AirportApiTests(APITestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def test_list_cities(self):
-        sample_country()
-        sample_country(name="City 2")
+    def test_list_airports(self):
+        city = sample_city(country=sample_country())
+        sample_airport(city=city)
+        sample_airport(name="Airport 2", city=city)
 
-        url = reverse("airport:city-list")
+        url = reverse("airport:airport-list")
         res = self.client.get(url)
 
-        countries = Country.objects.all()
+        airports = Airport.objects.all()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(2, countries.count())
+        self.assertEqual(2, airports.count())
 
     def test_create_city(self):
-        url = reverse("airport:city-list")
-        payload = {"name": "City 1", "country": sample_country().id}
+        url = reverse("airport:airport-list")
+        payload = {
+            "name": "Airport 1",
+            "closest_big_city": sample_city(country=sample_country()).id,
+        }
         res = self.client.post(url, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        city = City.objects.get(id=res.data["id"])
-        self.assertEqual(payload["name"], city.name)
+        airport = Airport.objects.get(id=res.data["id"])
+        self.assertEqual(payload["name"], airport.name)
