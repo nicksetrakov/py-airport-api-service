@@ -70,8 +70,8 @@ def sample_route(source, destination, **params):
 
 def sample_flight(route, airplane, **params):
     defaults = {
-        "departure_time": "2024-06-10 08:00:00",
-        "arrival_time": "2024-06-10 12:00:00",
+        "departure_time": datetime.now().isoformat(),
+        "arrival_time": datetime.now().isoformat(),
     }
     defaults.update(params)
     flight = Flight.objects.create(route=route, airplane=airplane, **defaults)
@@ -87,21 +87,7 @@ def sample_ticket(flight, **params):
 
 def sample_order(**params):
     order = Order.objects.create(**params)
-    order.tickets.add(
-        sample_ticket(
-            flight=sample_flight(
-                route=sample_route(
-                    source=sample_airport(
-                        city=sample_city(country=sample_country())
-                    ),
-                    destination=sample_airport(
-                        city=sample_city(country=sample_country())
-                    ),
-                ),
-                airplane=sample_airplane(airplane_type=sample_airplane_type()),
-            )
-        )
-    )
+
     return order
 
 
@@ -382,3 +368,58 @@ class FlightApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         flight = Flight.objects.get(id=res.data["id"])
         self.assertEqual(payload["airplane"], flight.airplane.id)
+
+
+class OrderApiTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "testuser", "password123", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_list_orders(self):
+        city = sample_city(country=sample_country(name="Country 3"))
+        airport1 = sample_airport(name="Airport 3", city=city)
+        airport2 = sample_airport(name="Airport 4", city=city)
+        route1 = sample_route(source=airport1, destination=airport2)
+        route2 = sample_route(source=airport2, destination=airport1)
+        airplane_type1 = sample_airplane_type(name="Airplane Type 2")
+        airplane1 = sample_airplane(airplane_type=airplane_type1)
+        flight = sample_flight(route=route1, airplane=airplane1)
+        order = sample_order(user=self.user)
+        ticket = sample_ticket(flight=flight, order=order)
+
+        url = reverse("airport:order-list")
+        res = self.client.get(url)
+
+        orders = Order.objects.all()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(1, orders.count())
+
+    def test_create_order(self):
+        url = reverse("airport:order-list")
+        country = sample_country()
+        city = sample_city(country=country)
+        airport = sample_airport(city=city)
+        airplane = sample_airplane(airplane_type=sample_airplane_type())
+        flight = sample_flight(
+                        route=sample_route(
+                            source=airport, destination=airport
+                        ),
+                        airplane=airplane,
+                    )
+        payload = {
+            "tickets": [
+                {
+                    "row": 11,
+                    "seat": 3,
+                    "flight": flight.id
+                },
+            ]
+        }
+        res = self.client.post(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        order = Order.objects.get(id=res.data["id"])
+        self.assertEqual(payload["tickets"][0]["flight"], order.tickets.all()[0].flight.id)
