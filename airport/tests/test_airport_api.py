@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
@@ -334,3 +336,49 @@ class RouteApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         route = Route.objects.get(id=res.data["id"])
         self.assertEqual(payload["source"], route.source.id)
+
+
+class FlightApiTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "testuser", "password123", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_list_flights(self):
+        city = sample_city(country=sample_country())
+        airport1 = sample_airport(city=city)
+        airport2 = sample_airport(name="Airport 2", city=city)
+        route1 = sample_route(source=airport1, destination=airport2)
+        route2 = sample_route(source=airport2, destination=airport1)
+        airplane_type1 = sample_airplane_type()
+        airplane1 = sample_airplane(airplane_type=airplane_type1)
+        sample_flight(route=route1, airplane=airplane1)
+        sample_flight(route=route2, airplane=airplane1)
+
+        url = reverse("airport:flight-list")
+        res = self.client.get(url)
+
+        flights = Flight.objects.all()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(2, flights.count())
+
+    def test_create_flight(self):
+        url = reverse("airport:flight-list")
+        airplane = sample_airplane(airplane_type=sample_airplane_type())
+        airport = sample_airport(city=sample_city(country=sample_country()))
+        route = sample_route(source=airport, destination=airport)
+        crew = sample_crew()
+        payload = {
+            "route": route.id,
+            "airplane": airplane.id,
+            "departure_time": datetime.now().isoformat(),
+            "arrival_time": datetime.now().isoformat(),
+            "crew": [crew.id],
+        }
+        res = self.client.post(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        flight = Flight.objects.get(id=res.data["id"])
+        self.assertEqual(payload["airplane"], flight.airplane.id)
