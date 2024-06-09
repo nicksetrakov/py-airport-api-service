@@ -284,7 +284,7 @@ class AirportApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(2, airports.count())
 
-    def test_create_city(self):
+    def test_create_airport(self):
         url = reverse("airport:airport-list")
         payload = {
             "name": "Airport 1",
@@ -295,3 +295,42 @@ class AirportApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         airport = Airport.objects.get(id=res.data["id"])
         self.assertEqual(payload["name"], airport.name)
+
+
+class RouteApiTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "testuser", "password123", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_list_routes(self):
+        city = sample_city(country=sample_country())
+        airport1 = sample_airport(city=city)
+        airport2 = sample_airport(name="Airport 2", city=city)
+        sample_route(source=airport1, destination=airport2)
+        sample_route(source=airport2, destination=airport1)
+
+        url = reverse("airport:route-list")
+        res = self.client.get(url)
+
+        routes = Route.objects.all()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(2, routes.count())
+
+    def test_create_route(self):
+        url = reverse("airport:route-list")
+        city = sample_city(country=sample_country())
+        airport1 = sample_airport(city=city)
+        airport2 = sample_airport(name="Airport 2", city=city)
+        payload = {
+            "source": airport1.id,
+            "destination": airport2.id,
+            "distance": 10,
+        }
+        res = self.client.post(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        route = Route.objects.get(id=res.data["id"])
+        self.assertEqual(payload["source"], route.source.id)
