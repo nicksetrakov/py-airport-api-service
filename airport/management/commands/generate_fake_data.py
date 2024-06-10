@@ -29,6 +29,7 @@ class Command(BaseCommand):
         self.create_airplanes()
         self.create_routes()
         self.create_flights()
+        self.create_superuser()
         self.create_orders()
         self.stdout.write("Fake data generated successfully.")
 
@@ -112,6 +113,16 @@ class Command(BaseCommand):
                 flight = random.choice(flights)
                 row = random.randint(1, flight.airplane.rows)
                 seat = random.randint(1, flight.airplane.seats_in_row)
-                Ticket.objects.create(
+                Ticket.objects.get_or_create(
                     order=order, flight=flight, row=row, seat=seat
                 )
+
+    def create_superuser(self):
+        email = "admin@gmail.com"
+        password = "admin"
+        User = get_user_model()
+        if not User.objects.filter(email=email).exists():
+            User.objects.create_superuser(email=email, password=password)
+            self.stdout.write("Superuser created successfully.")
+        else:
+            self.stdout.write("Superuser already exists.")
