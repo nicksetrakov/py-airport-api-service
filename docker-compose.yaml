@@ -28,7 +28,19 @@ services:
     volumes:
       - my_db:$PGDATA
 
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:$PGADMINDATA
 
 volumes:
   my_db:
   my_media:
+  pgadmin_data:
