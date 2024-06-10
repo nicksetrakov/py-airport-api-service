@@ -404,22 +404,18 @@ class OrderApiTests(APITestCase):
         airport = sample_airport(city=city)
         airplane = sample_airplane(airplane_type=sample_airplane_type())
         flight = sample_flight(
-                        route=sample_route(
-                            source=airport, destination=airport
-                        ),
-                        airplane=airplane,
-                    )
+            route=sample_route(source=airport, destination=airport),
+            airplane=airplane,
+        )
         payload = {
             "tickets": [
-                {
-                    "row": 11,
-                    "seat": 3,
-                    "flight": flight.id
-                },
+                {"row": 11, "seat": 3, "flight": flight.id},
             ]
         }
         res = self.client.post(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get(id=res.data["id"])
-        self.assertEqual(payload["tickets"][0]["flight"], order.tickets.all()[0].flight.id)
+        self.assertEqual(
+            payload["tickets"][0]["flight"], order.tickets.all()[0].flight.id
+        )
