@@ -64,6 +64,7 @@ python manage.py runserver
 
 The API should now be accessible at http://localhost:8000/
 
+
 ## RUN with Docker
 
 Docker should bу installed
@@ -78,6 +79,11 @@ The API should now be accessible at http://localhost:8001/
 
 # Getting access
  - create user api/user/register/
+ - or use Admin credentials:
+```
+email: admin@gmail.com
+password: admin
+```
  - get access token api/user/token/
 
  - To authenticate, include the obtained token in your request headers with the format:
