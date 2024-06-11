@@ -383,12 +383,11 @@ class OrderApiTests(APITestCase):
         airport1 = sample_airport(name="Airport 3", city=city)
         airport2 = sample_airport(name="Airport 4", city=city)
         route1 = sample_route(source=airport1, destination=airport2)
-        route2 = sample_route(source=airport2, destination=airport1)
         airplane_type1 = sample_airplane_type(name="Airplane Type 2")
         airplane1 = sample_airplane(airplane_type=airplane_type1)
         flight = sample_flight(route=route1, airplane=airplane1)
         order = sample_order(user=self.user)
-        ticket = sample_ticket(flight=flight, order=order)
+        sample_ticket(flight=flight, order=order)
 
         url = reverse("airport:order-list")
         res = self.client.get(url)
