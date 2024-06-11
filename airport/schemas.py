@@ -1,15 +1,11 @@
-from drf_spectacular.openapi import AutoSchema
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
-    OpenApiExample,
-    OpenApiResponse,
 )
 from .serializers import (
     CrewSerializer,
     AirplaneTypeSerializer,
-    AirplaneImageSerializer,
     AirplaneDetailSerializer,
     AirplaneListSerializer,
     CountrySerializer,
