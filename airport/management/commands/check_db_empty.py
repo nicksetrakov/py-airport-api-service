@@ -6,7 +6,10 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Check if the database is empty and populate it with fake data if it is"
+    help = (
+        "Check if the database is empty"
+        " and populate it with fake data if it is"
+    )
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Checking if database is empty...")
