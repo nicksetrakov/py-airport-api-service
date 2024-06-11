@@ -9,6 +9,7 @@ services:
     volumes:
       - ./:/app
       - my_media:/files/media
+      - ./logs:/app/logs
     command: > 
       sh -c "
       python manage.py wait_for_db
@@ -50,3 +51,4 @@ volumes:
   my_db:
   my_media:
   pgadmin_data:
+  logs:
