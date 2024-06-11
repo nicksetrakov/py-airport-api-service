@@ -1,0 +1,26 @@
+ERROR 2024-06-11 09:47:37,716 log Internal Server Error: /api/airport/trigger-error/
+Traceback (most recent call last):
+  File "D:\pythonProject\py-airport-api-service\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\pythonProject\py-airport-api-service\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\pythonProject\py-airport-api-service\airport\views.py", line 64, in trigger_error
+    1 / 0  # Ýòî âûçîâåò ZeroDivisionError
+    ~~^~~
+ZeroDivisionError: division by zero
+ERROR 2024-06-11 09:47:37,740 basehttp "GET /api/airport/trigger-error/ HTTP/1.1" 500 81852
+ERROR 2024-06-11 06:59:00,870 log Internal Server Error: /api/airport/trigger-error/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/airport/views.py", line 64, in trigger_error
+    1 / 0  # Ð­Ñ‚Ð¾ Ð²Ñ‹Ð·Ð¾Ð²ÐµÑ‚ ZeroDivisionError
+    ~~^~~
+ZeroDivisionError: division by zero
+ERROR 2024-06-11 06:59:00,895 basehttp "GET /api/airport/trigger-error/ HTTP/1.1" 500 75733
