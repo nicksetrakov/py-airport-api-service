@@ -120,9 +120,9 @@ class Command(BaseCommand):
     def create_superuser(self):
         email = "admin@gmail.com"
         password = "admin"
-        User = get_user_model()
-        if not User.objects.filter(email=email).exists():
-            User.objects.create_superuser(email=email, password=password)
+        user = get_user_model()
+        if not user.objects.filter(email=email).exists():
+            user.objects.create_superuser(email=email, password=password)
             self.stdout.write("Superuser created successfully.")
         else:
             self.stdout.write("Superuser already exists.")
